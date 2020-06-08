@@ -22,7 +22,8 @@ Résolution d'équations non-linéaires}
 \newpage
 
 \section{Introduction}
-
+    Le but de ce projet est de décrire les algorithmes les plus fréquemment utilisés pour résoudre des équations non linéaires du type :
+                         f (x) = 0
 \newpage
 
 
@@ -134,11 +135,179 @@ class Dichotomie(Equa_Solver):
 
 
 
-\section{Méthode De Newton}
+\section{Méthode de Newton}
+\subsection{Présentation} 
+    Sous sa forme moderne, l'algorithme peut être présenté brièvement comme suit: à chaque itération, la fonction dont on cherche un zéro est linéarisée en l'itéré (ou point) courant et l'itéré suivant est pris égal au zéro de la fonction linéarisée. Cette description sommaire indique qu'au moins deux conditions sont requises pour la bonne marche de l'algorithme : la fonction doit être différentiable aux points visités (pour pouvoir y linéariser la fonction) et les dérivées ne doivent pas s'y annuler (pour que la fonction linéarisée ait un zéro) ; s'ajoute à ces conditions la contrainte forte de devoir prendre le premier itéré assez proche d'un zéro régulier de la fonction (i.e., en lequel la dérivée de la fonction ne s'annule pas), pour que la convergence du processus soit assurée.
+
+\subsection{Interpretation Géometrique}
+\subsection{Implementation du code}
+\begin{lstlisting}[language=Python, caption=Méthode de Newton en Python]
+
+class Newton(Equa_Solver):
+
+    def solve_with_df(self):
+        f=self.f
+        Df=self.df
+        max_iter=self.max_iter
+        x0=self.x0
+        epsilon=self.err
+        x_list=[]
+
+        fx = lambda x: eval(str(f))
+        dfx = lambda x: eval(str(Df))
+        print("\n\nfunction f : ", f, "\n", "Derivative f' : ", Df, "\n", "--------------------------------")
+        xn = x0
+        for n in range(0, max_iter):
+            fxn = fx(xn)
+            x_list.append(xn)
+            self.affiche_info(n,xn,fxn)
+            if abs(fxn) < epsilon:
+                print('Found solution after', n, 'iterations.')
+                print("the approximate solution is : ",x_list[-1])
+                return x_list
+
+            Dfxn = dfx(xn)
+
+            if Dfxn == 0:
+                print('Zero derivative. No solution found.')
+                return None
+            xn = xn - fxn / Dfxn
+
+        print('Exceeded maximum iterations. No solution found.')
+        return None
+        
+    def solve_without_df(self):
+        f=self.f
+        max_iter=self.max_iter
+        x0=self.x0
+        epsilon=self.err
+        x_list=[]
+
+
+        x = Symbol('x')
+        fx = lambda x: eval(str(f))
+        dfx = lambda x: eval(str(diff(f)))
+        print("\n\nfunction f : ", f, "\n", "Derivative f' : ", diff(f), "\n", "--------------------------------")
+
+        xn = x0
+
+        for n in range(0, max_iter):
+            fxn = fx(xn)
+            x_list.append(xn)
+            self.affiche_info(n, xn, fxn)
+            if abs(fxn) < epsilon:
+                print('Found solution after', n, 'iterations.')
+                print("the approximate solution is : ",x_list[-1])
+                return x_list
+                
+            Dfxn = dfx(xn)
+            if Dfxn == 0:
+                print('Zero derivative. No solution found.')
+                return None
+            xn = xn - fxn / Dfxn
+        print('Exceeded maximum iterations. No solution found.')
+        return None
+\end{lstlisting}
 \newpage
-\section{Méthode De Cordes}
+\subsection{Convergence}
+
+Avantages de la méthode : s’il y a convergence, celle-ci est rapide (souvent quadratique), elle nécessite un
+seul point de départ.
+
+Inconvénients de la méthode : f doit être suffisamment régulière, la convergence n’est pas assurée dans tous
+les cas, s’il y a plusieurs racines elle ne converge par forcément vers la plus proche du point de départ.
+
+
+
+
+
 \newpage
-\section{Méthode De Fausse-Position}
+\section{Méthode des Cordes}
+\subsection{Présentation} 
+ 
+
+\subsection{Interpretation Géometrique}
+\subsection{Implementation du code}
+\begin{lstlisting}[language=Python, caption=Méthode des cordes en Python]
+    class Cordes(Equa_Solver):
+    
+    def solve(self):
+        f=self.f
+        a,b =self.a,self.b
+        max_iter=self.max_iter
+        epsilon=self.err
+        x_list=[]
+
+        fx = lambda x: eval(str(f))
+        print("\n\nfunction f : ", f, " dans l'intervalle [", a, ",", b, "] \n", "--------------------------------")
+
+
+        for n in range(0, max_iter):
+            self.affiche_info(n, b, fx(b))
+            x_list.append(b)
+            if (abs(a - b) < epsilon):
+                print('Found solution after', n, 'iterations.')
+                return x_list
+
+            z = (a * fx(b) - b * fx(a)) / (fx(b) - fx(a))
+            a, b = b, z
+
+        print('Exceeded maximum iterations =', max_iter, '.No solution found.')
+        return None
+\end{lstlisting}
+\newpage
+\subsection{Convergence}
+
+
+
+
+
+
+\newpage
+\section{Méthode de la Fausse-Position}
+\subsection{Présentation} 
+    
+
+\subsection{Interpretation Géometrique}
+\subsection{Implementation du code}
+\begin{lstlisting}[language=Python, caption=Méthode de la Fausse Position en Python]
+class FalsePosition(Equa_Solver):
+
+    def solve(self):
+        f=self.f
+        a,b=self.a,self.b
+        tol=self.err
+        x_list=[]
+        fx = lambda x: eval(str(f))
+        print("\n\nfunction f : ", f, " dans l'intervalle [", a, ",", b, "] \n", "--------------------------------")
+
+        if fx(a) * fx(b) > 0:
+            raise SolverException(" f(a) et f(b) doivent etre de signe different !")
+
+        n = 0
+        while abs(b - a) > 2 * tol:
+            c = (a * fx(b) - b * fx(a)) / (fx(b) - fx(a))
+            self.affiche_info(n, c, fx(c))
+            n += 1
+
+            x_list.append(c)
+
+            if fx(c - tol) * fx(c + tol) <= 0:
+                print('Found solution after', n, 'iterations.')
+                return x_list
+            if fx(a) * fx(c) > 0:
+                a = c
+            else:
+                b = c
+            
+        print('Found solution after', n, 'iterations.')
+        x_list.append((a+b)/2)
+        return x_list
+\end{lstlisting}
+\newpage
+\subsection{Convergence}
+.
+
 \newpage
 \section{Interface Graphique}
 \subsection{Outils utilisés}
