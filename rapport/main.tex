@@ -1,0 +1,230 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[ruled,vlined]{algorithm2e}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{siunitx}
+\usepackage{amsfonts}
+
+\newcommand{\R}{\mathbb{R}}
+
+\author{Benamara Abdelkader \\ Benichou Yaniv }
+\date{08 Juin 2020}
+
+\begin{document}
+\title{Projet maths-info \\ 
+Résolution d'équations non-linéaires}
+\maketitle
+
+\newpage
+\tableofcontents
+\newpage
+
+\section{Introduction}
+
+\newpage
+
+
+\section{Méthode De Dichotomie}
+\subsection{Théoreme des valeurs intermédiaires :}
+Pour toute application continue $ f : [a, b] \to \R $ et tout reel u compris entre f(a) et f(b), il existe au moins un reel c compris entre a et b tel que f(c) = u. \\
+En particulier on a la version de Bolzano qui nous interesse précisement.
+
+\subsection{Théoreme de Bolzano}
+Soit une fonction continue $ f : [a, b] \to \R $ \\
+si $ f(a)f(b) < 0 $  alors $ \exists \alpha \in  ]a, b[ $ tel que f($\alpha$)=0. \\ 
+
+
+On considère deux nombres réels a et b et une fonction réelle f continue sur l'intervalle [a, b] telle que f(a) et f(b) soient de signes opposés. Supposons que nous voulions résoudre l'équation f(x) = 0. D'après le théorème des valeurs intermédiaires, f a au moins un zéro dans l’intervalle [a, b]. La méthode de dichotomie consiste à diviser l’intervalle en deux en calculant m = (a+b) / 2. \\
+Il y a maintenant deux possibilités : ou f(a) et f(m) sont de signes contraires, ou f(m) et f(b) sont de signes contraires.
+
+L’algorithme de dichotomie est alors appliqué au sous-intervalle dans lequel le changement de signe se produit, ce qui signifie que l’algorithme de dichotomie est récursif.
+\subsection{L'algorithme de dichotomie}
+
+\begin{algorithm}[H]
+\SetAlgoLined
+\KwResult{millieu $\:$ tq $\:$ f(millieu)=0}
+ initialization\;
+ \While{fin-debut > err}{
+  millieu = (debut + fin ) / 2\;
+  \eIf{f(millieu) >  0}{
+   fin = millieu\;
+   }{
+   debut=millieu\;
+  }
+ }
+ \caption{Méthode de dichotomie}
+\end{algorithm}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+\lstset{style=mystyle}
+\newpage
+\begin{lstlisting}[language=Python, caption=Méthode de dichotomie en Python]
+class Dichotomie(Equa_Solver):
+
+    def solve(self):
+        # Donnees en parametres
+        a , b = self.a , self.b
+        err=self.err
+        try:
+            f = lambda x: eval(str(self.f))
+        except (TypeError,SyntaxError):
+            return
+        x_list=[]
+
+        print(f" Fonction   : {self.f}")
+        print(f" Intervalle : [{a},{b}]")
+        print(f" Erreur     : {err} \n")
+
+
+        if( f(a)*f(b) > 0):
+            raise SolverException(" f(a) et f(b) doivent etre de signe different !")
+
+        else:
+            debut = a
+            fin = b
+            n=1
+
+            while (fin - debut > err):
+                millieu = (debut + fin) / 2
+                x_list.append(millieu)
+                print(f"Found solution after {n} iterations : {millieu} ")
+                n+=1
+                if (f(debut) * f(millieu) < 0):
+                    fin = millieu
+                else:
+                    debut = millieu
+
+            print(f" Solution approchee de f(x) = 0 est : {millieu}\n")
+            return x_list
+\end{lstlisting}
+
+
+
+
+
+
+
+
+\newpage
+
+
+
+
+\section{Méthode De Newton}
+\newpage
+\section{Méthode De Cordes}
+\newpage
+\section{Méthode De Fausse-Position}
+\newpage
+\section{Interface Graphique}
+\subsection{Outils utilisés}
+Afin de produire une version plus pratique à l'utilisateur plutot que faire un affichage sur console délicat de suivre les résultats avec on a préviligé de réaliser une interface graphique plutot simple mais efficace.\\
+La réalisation de cette interface a été effectué à l'aide de la bibliotheque Tkinter des modules déjà existants sur Python et aussi la réalisation des graphes pour pouvoir afficher les courbes et les différents résultats était fait à l'aide de la bilbiotheque Matplotlib qui du fait doit etre installé pour le bon fonctionnement du projet.
+\\ \\
+Notre application est consitué de 5 principales pages :
+\subsection{Accueil}
+\includegraphics[width=13cm,height=8cm]{img/accueil.JPG}\\
+
+L'interface d'accueil de notre application est constitué des quatres méthodes déjà citées afin de résoudre \\ des equations f(x)=0 et pour accéder à chaque méthode il suffit de suivre le boutton correspandant \\
+à la méthode\\
+Alors dans ce qui suit on va détailler chaque page dans notre interface graphique 
+
+\subsection{Dichotomie}
+\includegraphics[width=13cm,height=8cm]{img/dicho.JPG}\\
+
+Sur cette page on s'occupe de la méthode de dichotomie donc on prend en parametres :\\
+-une fonction f\\
+-un interval [a,b]
+
+Alors si l'utilisateur de notre application rentre bien les infomations attendus et puis il clique sur le boutton solve il aura un affichage :\\
+\includegraphics[width=13cm,height=7cm]{img/dicho_graph.JPG}\\
+
+Dans la fenetre on remarque bien les informations relatives à la fonction rentrée mais aussi les résultats retournés apres éxecution de la méthode de Dichotomie \\
+NB : le tableau affiche les résultats des 10 dernieres itérations de cette méthode  
+\subsubsection{Convergence}
+Pour la méthode de dichotomie la convergence vers la solution est graphiqueement représentés par des lignes horizontales qui se rapprochent du point cherché comme il suit : \\
+\includegraphics[width=13cm,height=7cm]{img/dicho_cv.JPG}\\
+
+
+\subsection{Newton}
+\includegraphics[width=13cm,height=7cm]{img/newton.JPG}\\
+
+Dans cette page on résout les equations f(x)=0 à l'aide de la méthode de Newton donc on prends en arguments une fonction f et optionnellement sa dérivée et aussi un point de départ de notre récurrence  $ x_0 $
+et un champ error qui indique avec quelle précision les résultats devront etre pris en compte cette valeur est initialisée à $\num{e-15}$ de base.\\
+Apres rensignement des champs et cliquer sur le boutton solve une fentetre va s'afficher :\\
+\includegraphics[width=13cm,height=7cm]{img/newton_graph.JPG}\\
+avec toutes les information comme déja expliquer dans le paragraphe précédent mais cette fois çi le taux de convergence est explicitement calculé et donné avec les résultats
+
+\subsection{Cordes}
+\includegraphics[width=13cm,height=7cm]{img/cordes.JPG}\\
+
+Cette page s'occupe comme son nom l'indique de résolution des equation f(x)=0 à l'aide de la méthode des cordes elle prend en arguments une fonction f et un interval [a,b] et un clique sur le boutton solve nous donne cette fenetre :\\ 
+\includegraphics[width=13cm,height=7cm]{img/cordes_graph.JPG}\\
+
+Comme bien illustré sur le graphique on nous permet de suivre la convergence de la solution volu tout en affichant le taux de convergence correspandant avec les informations nécaissaires de la fonction et l'interval.\\
+\subsection{Fausse Position}
+\includegraphics[width=13cm,height=7cm]{img/fausse_pos.JPG}\\
+
+Cette page s'occupe comme son nom l'indique de résolution des equation f(x)=0 à l'aide de la méthode de fausse position elle prend en arguments une fonction f et un interval [a,b] et un clique sur le boutton solve nous donne cette fenetre : \\
+\includegraphics[width=13cm,height=7cm]{img/cordes_graph.JPG}\\
+
+Comme bien illustré sur le graphique on nous permet de suivre la convergence de la solution volu tout en affichant le taux de convergence correspandant avec les informations nécaissaires de la fonction et l'interval.\\
+\newpage
+\subsection{Gestion des erreurs}
+Comme déja cité dans les différentes fentetres de notre application une vérification de données tapées est nécaissaire pour le bon fonctionnement du projet alors les vérifications faites sont :
+
+\subsubsection{Formule Erronée}
+\includegraphics[width=13cm,height=6cm]{img/validation/err_fct.JPG}\\
+
+Une formule entrée en champ dédiée est dite erronée si elle est mal exprimée au sens de Python donc toutes les formules sont supposées écrites en syntaxe de Python
+
+\subsubsection{Monotonie}
+\includegraphics[width=13cm,height=6cm]{img/validation/err_fa_fb.JPG}\\
+
+Si on rentre une fonction qui ne vérifie pas la condition des hypotheses de théoreme de valeurs intermédiaires une érreur s'affichera indiquant ce fait .
+
+\subsubsection{Interval Erroné}
+\includegraphics[width=13cm,height=5cm]{img/validation/err_interval.JPG}\\
+
+Si on rentre un interval qui ne correspand un de ces bornes à des nombres (entiers ou floats) une érreur de type interval erroné s'affichera.
+
+\subsubsection{Max d'itération atteint sans trouver de solution}
+\includegraphics[width=13cm,height=8cm]{img/validation/err_max.JPG}\\
+
+Si notre fonction n'admet pas de valeurs qui le rendent nulle dans l'interval donné et donc on atteint le maximum d'itération sans trouver de solution pour f(x)=0 alors on afficher la fentetre d'erreur ci dessous
+
+
+\newpage
+\section{Applications}
+\newpage
+\section{Conclusion}
+
+
+
+
+
+\end{document}
