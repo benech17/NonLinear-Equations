@@ -6,7 +6,13 @@
 \usepackage{graphicx}
 \usepackage{siunitx}
 \usepackage{amsfonts}
-
+\usepackage{color}   %May be necessary if you want to color links
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true, %set true if you want colored links
+    linktoc=all,     %set to all if you want both sections and subsections linked
+    linkcolor=blue,  %choose some color if you want links to stand out
+}
 \newcommand{\R}{\mathbb{R}}
 
 \author{Benamara Abdelkader \\ Benichou Yaniv }
@@ -160,12 +166,12 @@ compte les informations données par les valeurs de f et, éventuellement, par s
 
 Ecrivons pour cela le développement de Taylor de f en $\alpha$  au premier ordre.
 On obtient alors la version linéarisée du problème
-$f(\alpha) = 0 = f(x) + (\alpha−x)f(\eta)$,
+$f(\alpha) = 0 = f(x) + (\alpha - x)f'(\eta)$,
 où $\eta$ est entre $\alpha$ et x. L’équation  conduit à la méthode itérative suivante :
-$\forall k \geq 0$, étant donné $x^k$ , déterminer $x^(k+1)$ en résolvant l’équation
-$ f(x^k) + (x^{k+1}-x^k)q_k = 0$, où $q_k$ est une approximation de $f(x^k)$.
+$\forall k \geq 0$, étant donné $x^k$ , déterminer $x^{k+1}$ en résolvant l’équation : \\ 
+$ f(x^k) + (x^{k+1}-x^k)q_k = 0$, où $q_k$ est une approximation de $f'(x^k)$.
 
-\quadd Considérons maintenant quatre choix particuliers de $q_k$ . \\
+\quadd A present et pour les prochaines méthodes que nous présenterons, nous effectuerons des choix sur $q_k$ . \\
 \quadd Ici on pose : \quad $q_k=f'(x_k)  \quad \forall k\geq 0$ \\ et en se donnant la valeur initiale $x^0$ , on obtient la méthode de Newton : \\
     \quadd $x^{k+1} = x^k - \frac{f(x^k)}{f'(x^k)} \quad \forall k\geq 0$ \\
 
@@ -394,6 +400,40 @@ La méthode de la fausse position peut être vue comme une méthode globalement 
 La méthode de la fausse position peut se voir un peu comme un entre-deux , entre les methodes de dichotomie (globalement convergente ) et des cordes ( meilleur taux de convergence).
 
 \newpage
+\section{Comparaison des méthodes}
+Pour comparer les algorithmes, il est important de tenir compte de la présence ou non des facteurs suivants :
+ -assurance de la convergence
+ - vitesse de la convergence
+ - stabilité de l'algorithme - précision des résultats
+ - complexité des calculs (ex : nombre de fonctions à calculer à chaque itération). 
+En outre, on peut résumer, en addition à ce que nous avons dit précedemment :
+\begin{itemize}
+    \item  Méthode de dichotomie : \\
+        - Avantages:  \\
+        la convergence est assurée,\quad on a un encadrement de la solution , \quad un seul calcul de fonction à chaque itération \\
+        -Inconvénients : \\
+           vitesse de convergence linéaire, donc lente , \quad
+           sensible aux erreurs d'arrondi ; (exemple : la fonction $f(x) = e^x - 1 - x - \frac{x^2}{2} $ s'annule théoriquement en x = 0 seulement. Numériquement, elle change de signe un grand nombre de fois autour de x = 0.
+    
+    \item  Methode des cordes : \\
+             - Avantages:  \\
+        nécessite une seule évaluation de fonction à chaque étape\quad , convergence relativement rapide, bien que moins que celle de Newton \\
+        -Inconvénients : \\
+         comme la méthode de Newton, peut diverger si les données initiales sont mal choisies, \quad
+          le calcul de f (xn) − f (xn−1) peut produire des erreurs de chute.
+    \item  Methode de Newton : \\
+             - Avantages:  \\
+        converge rapidement quand elle converge (ce qui compense largement le dernier inconvénient)\quad  relativement stable et peu sensible aux erreurs d'arrondis si $f'(x_{inf})$ n'est pas trop petit. \\
+        -Inconvénients : \\
+          peut diverger ou converger vers un autre zéro que celui cherché si la donnée initiale
+est mal choisie, \quad
+           nécessite le calcul de la dérivée d'une fonction, ce qui est numériquement dicile si
+on ne la connait pas explicitement , et enfin \quad chaque étape nécessite deux évaluations de fonctions
+    
+\end{itemize}
+    
+       
+
 \section{Interface Graphique}
 \subsection{Outils utilisés}
 Afin de produire une version plus pratique à l'utilisateur plutot que faire un affichage sur console délicat de suivre les résultats avec on a préviligé de réaliser une interface graphique plutot simple mais efficace.\\
@@ -473,7 +513,24 @@ Si notre fonction n'admet pas de valeurs qui le rendent nulle dans l'interval do
 
 
 \newpage
+\section{Ouverture : Acceleration de la convergence }
+D'une manière générale, étant donnée une suite $x_n$ convergeant vers $x_{inf}$, accélérer sa convergence consiste à la remplacer par une suite $y_n$ convergeant plus vite vers $x_{inf}$, c'est-à-dire vérifant : \\ \\
+        $\lim\limits_{n \rightarrow +\infty} \frac{ y_n - x_{inf} }{x_n - x_{inf}}=0$ \\
+        \\
+Par exemple, si $x_n$ converge linéairement, on cherchera à construire $y_n$ convergeant quadratiquement.
 
+Pour cela, on va utiliser la méthode de "relaxation". Elle est basée sur une idée très simple. Considérons une méthode de point fixe $x_{n+1} = g(x_n)$ qui ne converge pas ou très lentement vers un point fixe x*
+\\ L'équation qu'on cherche à résoudre $x = g(x)$ peut également s'écrire : \\
+$\alpha x + x = g(x) + \alpha x \quad \forall \alpha \quad réel $  \\
+
+L'écriture de l'équation sous cette forme suggère d'utiliser
+une nouvelle méthode de point fixe :
+    $x_{n+1} = \frac{g(x_n) + \alpha x_n}{ \alpha + 1 }:= G(xn)$ \\
+  Ceci  va converger (en choisissant
+d'initialiser assez près de la solution) dès que :
+    $|G'(x*)|=|\frac{g'(x*) + \alpha }{\alpha + 1} | < 1$ et ce d'autant plus rapidement que  $|\frac{g'(x*) + \alpha }{\alpha + 1} |$ est petit. \\
+    Comme on est parfaitement libre de choisir le paramètre $\alpha$ (qui s'appelle ici paramètre de relaxation), l'idée est de le prendre le plus proche possible de −g'(x*).\\ Bien sûr, la valeur exacte de g(x*) n'est en général pas connue, mais par encadrement on peut en avoir des valeurs approchées convenables, qu'on peut d'ailleurs réactualiser éventuellement au cours des itérations. En conclusion cette méthode est très simple d'utilisation et peut rendre de précieux services. Mais avant tout , il faudrait étudier la méthode des points fixes qui n'a pas été étudié ici.
+\newpage
 \section{Conclusion}
     Ainsi, nous avos pu étudier quelques méthodes utiles pour la résolution d'équations non linéaires en les présentant chacun avec leur caracteristiques propres, leurs avantages et leurs inconvénients.
     
