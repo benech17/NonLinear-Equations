@@ -22,8 +22,8 @@ Résolution d'équations non-linéaires}
 \newpage
 
 \section{Introduction}
-    Le but de ce projet est de décrire les algorithmes les plus fréquemment utilisés pour résoudre des équations non linéaires du type :
-                         f (x) = 0
+    Le but de ce projet est de décrire les algorithmes les plus fréquemment utilisés pour résoudre des équations non linéaires du type : \\ f(x) = 0
+                         
 \newpage
 
 
@@ -137,9 +137,33 @@ class Dichotomie(Equa_Solver):
 
 \section{Méthode de Newton}
 \subsection{Présentation} 
-    Sous sa forme moderne, l'algorithme peut être présenté brièvement comme suit: à chaque itération, la fonction dont on cherche un zéro est linéarisée en l'itéré (ou point) courant et l'itéré suivant est pris égal au zéro de la fonction linéarisée. Cette description sommaire indique qu'au moins deux conditions sont requises pour la bonne marche de l'algorithme : la fonction doit être différentiable aux points visités (pour pouvoir y linéariser la fonction) et les dérivées ne doivent pas s'y annuler (pour que la fonction linéarisée ait un zéro) ; s'ajoute à ces conditions la contrainte forte de devoir prendre le premier itéré assez proche d'un zéro régulier de la fonction (i.e., en lequel la dérivée de la fonction ne s'annule pas), pour que la convergence du processus soit assurée.
+\quad Afin de mettre au point des algorithmes possédant de meilleures propriétés de convergence que la méthode de dichotomie, il est nécessaire de prendre en
+compte les informations données par les valeurs de f et, éventuellement, par sa dérivée f' (si f est différentiable) ou par une approximation convenable de celle-ci.\\
+ L'algorithme de la méthode de Newton peut être présenté brièvement comme suit: à chaque itération, la fonction dont on cherche un zéro est linéarisée en l'itéré (ou point) courant et l'itéré suivant est pris égal au zéro de la fonction linéarisée. Cette description sommaire indique qu'au moins deux conditions sont requises pour la bonne marche de l'algorithme : la fonction doit être différentiable aux points visités (pour pouvoir y linéariser la fonction) et les dérivées ne doivent pas s'y annuler (pour que la fonction linéarisée ait un zéro) ; s'ajoute à ces conditions la contrainte forte de devoir prendre le premier itéré assez proche d'un zéro régulier de la fonction (i.e., en lequel la dérivée de la fonction ne s'annule pas), pour que la convergence du processus soit assurée. \\
+
+
+Ecrivons pour cela le développement de Taylor de f en $\alpha$  au premier ordre.
+On obtient alors la version linéarisée du problème
+$f(\alpha) = 0 = f(x) + (\alpha−x)f(\eta)$,
+où $\eta$ est entre $\alpha$ et x. L’équation  conduit à la méthode itérative suivante :
+$\forall k \geq 0$, étant donné $x^k$ , déterminer $x^(k+1)$ en résolvant l’équation
+$ f(x^k) + (x^{k+1}-x^k)q_k = 0$, où $q_k$ est une approximation de $f(x^k)$.
+
+\quadd Considérons maintenant quatre choix particuliers de $q_k$ . \\
+\quadd Ici on pose : \quad $q_k=f'(x_k)  \quad \forall k\geq 0$ \\ et en se donnant la valeur initiale $x^0$ , on obtient la méthode de Newton : \\
+    \quadd $x^{k+1} = x^k - \frac{f(x^k)}{f'(x^k)} \quad \forall k\geq 0$ \\
+
+A la k-ème itération, la méthode de Newton nécessite l’évaluation des deux fonctions f et f' au point $x^k$. Cet effort de calcul supplémentaire est plus
+que compensé par une accélération de la convergence, la méthode de Newton étant d’ordre 2. 
+
+Or, il est possible que la dérivée de la fonction f soit relativement pénible à calculer et c'est pour ça que nous avons présenté une deuxieme version d'implémentation de cette méthode,sans dérivée donnée en paramètre,puisqu'elle est automatiquement calculée.
+Cela rend la méthode de Newton très agréble à utiliser,puisqu'elle converge très rapidement et ne nécessite donc, uniquement un point approximatif $x_0$ comme argument supplementaire à la fonction.
+
 
 \subsection{Interpretation Géometrique}
+La méthode qu’on vient de décrire revient à chercher l’intersection entre
+l’axe des x et la droite de pente $q_k$ passant par le point ($x^k$,$f(x^k)$),ce qui s’écrit
+$x^{k+1} = x^k−q_k − 1 f(x^k) ) \forall k \geq 0 $.
 \subsection{Implementation du code}
 \begin{lstlisting}[language=Python, caption=Méthode de Newton en Python]
 
@@ -224,7 +248,11 @@ les cas, s’il y a plusieurs racines elle ne converge par forcément vers la pl
 \newpage
 \section{Méthode des Cordes}
 \subsection{Présentation} 
- 
+La méthode des cordes est une méthode comparable à celle de Newton, où l'on remplace ${\displaystyle f'(x_{n})\,}, par \quad  {\displaystyle {\frac {f(x_{n})-f(x_{n-1})}{x_{n}-x_{n-1}}}}$ \\ \\
+L'initialisation nécessite deux points $x_0$ et $x_1$, proches, si possible, de la solution recherchée. Il n'est pas nécessaire que $x_0$ et $x_1$ encadrent une racine de f. La méthode des cordes peut aussi être vue comme une généralisation de la méthode de la fausse position, où les calculs sont itérés. \\
+ Ici on pose donc : $q_k = \frac{f(x^k) - f(x^{k-1})}{x^k - x^{k-1}} \quad \forall k \geq 0 $
+ d’où on déduit, en se donnant deux valeurs initiales $x^{−1}$ et $x^0$,la relation suivante : \\ \\
+    $x^{k+1} = x^k - \frac{x^k - x^{k-1}}{ f(x^k)- f(x^{k-1}) }f(x^k)$
 
 \subsection{Interpretation Géometrique}
 \subsection{Implementation du code}
@@ -257,6 +285,9 @@ les cas, s’il y a plusieurs racines elle ne converge par forcément vers la pl
 \end{lstlisting}
 \newpage
 \subsection{Convergence}
+Si les valeurs initiales x0 et x1 sont suffisamment proches de la solution, la méthode aura un ordre de convergence de
+
+${\displaystyle \varphi ={\frac {1+{\sqrt {5}}}{2}}\simeq 1,618} $ qui est le nombre d'or.
 
 
 
