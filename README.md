@@ -7,11 +7,13 @@
 ## How To Launch 
 Une fois le dépot cloné, dans le repertoire courant du projet, : 
 > python3 main.py 
-va ouvrir une interface graphique vous proposant de résoudre une équations non linéaires avec la méthode souhaitée parmi ;
- 	* Dichotomie 
-	* Newton 
-	* Cordes (en réalité , ici nous avons codé la méthode de la sécante plutot que des cordes)
-	* Fausse Position
+
+va ouvrir une interface graphique vous proposant de résoudre une équations non linéaires avec la méthode souhaitée parmi :
+ * Dichotomie 
+ * Newton 
+ * Cordes (en réalité , ici nous avons codé la méthode de la sécante plutot que des cordes)
+ * Fausse Position
+ 
  Enfin, une fois les paramètres de l'équation entrés et validés, vous aurez un apercu graphique de sa résolution, avec un traçage des itérations et du taux de convergence.
  
  
